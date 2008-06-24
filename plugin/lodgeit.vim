@@ -1,6 +1,6 @@
 " lodgeit.vim: Vim plugin for paste.pocoo.org
 " Maintainer:   Armin Ronacher <armin.ronacher@active-4.com>
-" Version:      0.1.5
+" Version:      0.2
 
 " Usage:
 "   :Lodgeit    create a paste from the current buffer of selection
@@ -56,10 +56,10 @@ for key, value in language_mapping.iteritems():
     language_reverse_mapping[value] = key
 
 def paste_id_from_url(url):
-    regex = re.compile(r'^http://paste.pocoo.org/show/(\d+)/?$')
+    regex = re.compile(r'^http://paste.pocoo.org/show/([^/]+)/?$')
     m = regex.match(url)
     if m is not None:
-        return int(m.group(1))
+        return m.group(1)
 
 def make_utf8(code):
     enc = vim.eval('&fenc') or vim.eval('&enc')
@@ -79,10 +79,7 @@ if vim.eval('a:0') == '1':
     arg = vim.eval('a:1')
 
     if arg.startswith('#'):
-        try:
-            paste_id = int(arg[1:])
-        except:
-            pass
+        paste_id = arg[1:].split()[0]
     if paste_id is None:
         paste_id = paste_id_from_url(vim.eval('a:1'))
     if paste_id is not None:
@@ -90,12 +87,12 @@ if vim.eval('a:0') == '1':
 
     if paste:
         vim.command('tabnew')
-        vim.command('file Lodgeit\ Paste\ \#%d"' % paste_id)
+        vim.command('file Lodgeit\ Paste\ \#%s' % paste_id)
         vim.current.buffer[:] = paste['code'].splitlines()
         vim.command('setlocal ft=' + language_reverse_mapping.
                     get(paste['language'], 'text'))
         vim.command('setlocal nomodified')
-        vim.command('let b:lodgeit_paste_id=%d' % paste_id)
+        vim.command('let b:lodgeit_paste_id="%s"' % paste_id)
     else:
         print 'Paste not Found'
 
@@ -117,15 +114,15 @@ else:
 
     lng_code = language_mapping.get(vim.eval('&ft'), 'text')
     paste_id = new_paste(lng_code, code, parent)
-    url = 'http://paste.pocoo.org/show/%d' % paste_id
+    url = 'http://paste.pocoo.org/show/%s' % paste_id
 
-    print 'Pasted #%d to %s' % (paste_id, url)
+    print 'Pasted #%s to %s' % (paste_id, url)
     vim.command(':call setreg(\'+\', %r)' % url)
 
     if update_buffer_info:
-        vim.command('file Lodgeit\ Paste\ \#%d"' % paste_id)
+        vim.command('file Lodgeit\ Paste\ \#%s' % paste_id)
         vim.command('setlocal nomodified')
-        vim.command('let b:lodgeit_paste_id=%d' % paste_id)
+        vim.command('let b:lodgeit_paste_id="%s"' % paste_id)
 
 endpython
 endfunction
