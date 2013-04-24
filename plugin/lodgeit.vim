@@ -1,6 +1,7 @@
 " lodgeit.vim: Vim plugin for paste.pocoo.org
 " Maintainer:   Armin Ronacher <armin.ronacher@active-4.com>
-" Version:      0.2
+" Version:      0.3
+" License:      MIT
 
 " Usage:
 "   :Lodgeit    create a paste from the current buffer of selection
@@ -17,7 +18,7 @@ python << EOF
 import vim
 import re
 from xmlrpclib import ServerProxy
-srv = ServerProxy('http://paste.pocoo.org/xmlrpc/', allow_none=True)
+srv = ServerProxy('http://paste.pound-python.org/xmlrpc/', allow_none=True)
 
 new_paste = srv.pastes.newPaste
 get_paste = srv.pastes.getPaste
@@ -56,7 +57,7 @@ for key, value in language_mapping.iteritems():
     language_reverse_mapping[value] = key
 
 def paste_id_from_url(url):
-    regex = re.compile(r'^http://paste.pocoo.org/show/([^/]+)/?$')
+    regex = re.compile(r'^http://paste.pound-python.org/show/([^/]+)/?$')
     m = regex.match(url)
     if m is not None:
         return m.group(1)
@@ -114,7 +115,7 @@ else:
 
     lng_code = language_mapping.get(vim.eval('&ft'), 'text')
     paste_id = new_paste(lng_code, code, parent)
-    url = 'http://paste.pocoo.org/show/%s' % paste_id
+    url = 'http://paste.pound-python.org/show/%s' % paste_id
 
     print 'Pasted #%s to %s' % (paste_id, url)
     vim.command(':call setreg(\'+\', %r)' % url)
